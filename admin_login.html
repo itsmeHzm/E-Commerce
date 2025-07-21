@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Admin Login</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: url('https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3cfd178b-66c3-4756-8e9b-63df1ff3e510/dfe2mmj-2780d3da-7a83-4d39-9d29-3ab8cb3d3f6f.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzNjZmQxNzhiLTY2YzMtNDc1Ni04ZTliLTYzZGYxZmYzZTUxMFwvZGZlMm1tai0yNzgwZDNkYS03YTgzLTRkMzktOWQyOS0zYWI4Y2IzZDNmNmYuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.JFvZ1fk9SwWcQSAQwNY_3cE-RiD96bDljFE3N0AaRwA') center/cover no-repeat;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .card {
+            background: transparent;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: transparent;
+            color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .btn-custom {
+            background-color: transparent;
+            border: none;
+            color: white;
+        }
+
+        .btn-custom:hover {
+            background-color: rgba(59, 59, 59, 0.547);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h4>Admin Login</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="admin_login.php" method="post">
+                            <div class="form-group">
+                                <label for="username">Admin Username</label>
+                                <input type="text" class="form-control" id="username"
+                                    placeholder="Enter your admin username" name="admin_username">
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Admin Password</label>
+                                <input type="password" class="form-control" id="password"
+                                    placeholder="Enter your admin password" name="admin_password">
+                            </div>
+                            <button type="submit" class="btn btn-custom btn-block">Login as Admin</button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

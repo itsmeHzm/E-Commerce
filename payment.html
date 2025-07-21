@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Homepage - MoonStore</title>
+    <!-- QR Code library -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+
+    <style>
+        .payment-container {
+            border: 2px solid rgb(186, 186, 186);
+            /* Add outline style and color */
+            border-radius: 8px;
+            /* Optional: Add border radius for a rounded appearance */
+            padding: 15px;
+            /* Add padding for spacing */
+            margin-bottom: 15px;
+            /* Add margin to separate containers */
+        }
+
+        .payment-item img {
+            max-width: 100px;
+            /* Set a maximum width for the payment method images */
+            margin-right: 10px;
+            /* Add spacing between the image and text */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Payment Options -->
+    <section class="container mt-5">
+
+        <div class="user-info-container">
+            <p id="userName"></p>
+            <p id="userAddress"></p>
+            <p id="userPhoneNumber"></p>
+        </div>
+
+        <h2>Choose Your Payment Method</h2>
+
+        <form id="paymentForm" method="post" action="payment.php">
+            <!-- PayPal -->
+            <div class="payment-container">
+                <label class="payment-item" for="paypal">
+                    <input type="radio" id="paypal" name="paymentMethod" value="paypal" />
+                    <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" alt="PayPal" />
+                    PayPal
+                </label>
+            </div>
+
+            <!-- FPX -->
+            <div class="payment-container">
+                <label class="payment-item" for="FPXTransfer">
+                    <input type="radio" id="FPXTransfer" name="paymentMethod" value="FPXTransfer" />
+                    <img src="https://cdn1.codashop.com/S/content/common/images/mno/FPX_CHNL_LOGO.png"
+                        alt="Online Transfer" />
+                    FPX
+                </label>
+            </div>
+
+            <!-- Touch 'n Go -->
+            <div class="payment-container">
+                <label class="payment-item" for="tng">
+                    <input type="radio" id="tng" name="paymentMethod" value="touchngo" />
+                    <img src="https://cdn1.codashop.com/S/content/common/images/mno/TOUCH_N_GO_CHNL_LOGO.png"
+                        alt="Touch 'n Go" />
+                    Touch 'n Go
+                </label>
+            </div>
+
+            <!-- Shopee Pay -->
+            <div class="payment-container">
+                <label class="payment-item" for="ShopeePay">
+                    <input type="radio" id="ShopeePay" name="paymentMethod" value="ShopeePay" />
+                    <img src="https://cdn1.codashop.com/S/content/common/images/mno/SHOPEEPAY_CHNL_LOGO.png"
+                        alt="Shopee Pay" />
+                    Shopee Pay
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3" onclick="submitForm()">Proceed to Payment</button>
+        </form>
+    </section>
+
+    <!-- Touch 'n Go QR Code Modal -->
+    <div class="modal fade" id="touchNgoQrCodeModal" tabindex="-1" role="dialog"
+        aria-labelledby="touchNgoQrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="touchNgoQrCodeModalLabel">Touch 'n Go QR Code</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="touchNgoQrCode"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Shopee Pay QR Code Modal -->
+    <div class="modal fade" id="shopeePayQrCodeModal" tabindex="-1" role="dialog"
+        aria-labelledby="shopeePayQrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shopeePayQrCodeModalLabel">Shopee Pay QR Code</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="shopeePayQrCode"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <!-- qrcode.js -->
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch user data using AJAX
+            $.ajax({
+                type: 'GET',
+                url: 'get_user_data.php', // Replace with the correct URL
+                dataType: 'json',
+                success: function (data) {
+                    // Display user information on the page
+                    $('#userName').text('Name: ' + data.name);
+                    $('#userAddress').text('Address: ' + data.streetAddress + ', ' + data.city + ', ' + data.postcode + ', ' + data.state);
+                    $('#userPhoneNumber').text('Phone Number: ' + data.phoneNum);
+                },
+                error: function (error) {
+                    console.log('Error fetching user data:', error);
+                }
+            });
+
+            // Event listener for Touch 'n Go radio button
+            $('#tng').on('change', function () {
+                if ($(this).is(':checked')) {
+                    showTouchNGoQrCode();
+                }
+            });
+
+            // Event listener for Shopee Pay radio button
+            $('#ShopeePay').on('change', function () {
+                if ($(this).is(':checked')) {
+                    showShopeePayQrCode();
+                }
+            });
+        });
+
+        // Function to display Touch 'n Go QR code
+        function showTouchNGoQrCode() {
+            // Replace the following URL with the correct Touch 'n Go payment URL
+            var touchNgoPaymentData = 'https://example.com/touchngo-payment';
+
+            // Remove existing QR code if any
+            $('#touchNgoQrCode').empty();
+
+            // Generate QR code
+            var qrCode = new QRCode(document.getElementById('touchNgoQrCode'), {
+                text: touchNgoPaymentData,
+                width: 128,
+                height: 128
+            });
+
+            // Display payment instructions for Touch 'n Go
+            var paymentInstructions = `
+        <p>1. Open your Touch 'n Go eWallet app.</p>
+        <p>2. Scan the QR code below using the app's scanner.</p>
+        <p>3. Confirm the payment details on your app.</p>
+        <p>4. Complete the payment on your Touch 'n Go eWallet app.</p>
+    `;
+
+            // Append the instructions to the modal body
+            $('#touchNgoQrCode').append(paymentInstructions);
+
+            // Show the modal
+            $('#touchNgoQrCodeModal').modal('show');
+        }
+
+        // Function to display Shopee Pay QR code
+        function showShopeePayQrCode() {
+            // Replace the following URL with the correct Shopee Pay payment URL
+            var shopeePayPaymentData = 'https://example.com/shopeepay-payment';
+
+            // Remove existing QR code if any
+            $('#shopeePayQrCode').empty();
+
+            // Generate QR code
+            var qrCode = new QRCode(document.getElementById('shopeePayQrCode'), {
+                text: shopeePayPaymentData,
+                width: 128,
+                height: 128
+            });
+
+            // Display payment instructions for Shopee Pay
+            var paymentInstructions = `
+        <p>1. Open your Shopee app.</p>
+        <p>2. Go to the "ShopeePay" section.</p>
+        <p>3. Scan the QR code below using the app's scanner.</p>
+        <p>4. Confirm the payment details on your app.</p>
+        <p>5. Complete the payment on your Shopee app.</p>
+    `;
+
+            // Append the instructions to the modal body
+            $('#shopeePayQrCode').append(paymentInstructions);
+
+            // Show the modal
+            $('#shopeePayQrCodeModal').modal('show');
+        }
+
+        function submitForm() {
+            // Get the selected payment method
+            var selectedPaymentMethod = $('input[name=paymentMethod]:checked', '#paymentForm').val();
+
+            // Check if user has submitted address information
+            var userName = $('#userName').text().trim();
+            var userAddress = $('#userAddress').text().trim();
+            var userPhoneNumber = $('#userPhoneNumber').text().trim();
+
+            if (userName && userAddress && userPhoneNumber) {
+                // Redirect based on the selected payment method
+                switch (selectedPaymentMethod) {
+                    case 'paypal':
+                        // Redirect to PayPal login page
+                        window.location.href = 'https://www.paypal.com/signin';
+                        break;
+                    case 'touchngo':
+                        showTouchNGoQrCode();
+                        break;
+                    case 'ShopeePay':
+                        showShopeePayQrCode();
+                        break;
+                    default:
+                        // Handle default case or do nothing
+                        break;
+                }
+            } else {
+                // User has not submitted address information
+                alert('Please complete your address information before proceeding to checkout.');
+                // You can also add additional logic here, such as showing an error message or preventing the checkout.
+            }
+        }
+    </script>
+
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        crossorigin="anonymous"></script>
+
+    <!-- Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.10.2/umd/popper.min.js"
+        crossorigin="anonymous"></script>
+
+
+</body>
+
+</html>

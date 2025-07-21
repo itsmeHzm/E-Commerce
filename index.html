@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Homepage - MoonStore</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            flex: 1;
+        }
+
+        /* Add the sticky-footer class to make the footer sticky */
+        .sticky-footer {
+            flex-shrink: 0;
+        }
+
+        /* Fix the footer at the bottom */
+        footer {
+            margin-top: auto;
+        }
+
+        .stock-info {
+            color: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container px-4 px-lg-5">
+            <a class="navbar-brand" href="index.html">MoonStore ˚☾˚｡⋆</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="index.html" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="index.html">Merchandise</a></li>
+                            <li><a class="dropdown-item" href="Credit.html">Game Credit</a></li>
+
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" aria-current="page" href="transaction.html">Transaction
+                            History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="account.html">User</a></li>
+                </ul>
+                <form class="d-flex">
+                    <a class="btn btn-outline-dark" href="cart.html">Cart</a>
+                    <a class="btn btn-outline-dark ms-2 login-btn" href="login.html">Login</a>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <!-- Header-->
+    <header
+        style="margin-top: -50px; background: url('img/OIG.jpeg') no-repeat center center fixed; background-size: cover; height: 50vh; display: flex; align-items: center; justify-content: center;">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">Merchandise</h1>
+                <p class="lead fw-normal text-white-50 mb-0" style="color: rgb(255, 255, 255) !important;">"Your
+                    Authorized Gaming
+                    Team Reseller Jersey And Game Credit."</p>
+            </div>
+        </div>
+    </header>
+    <!-- Section-->
+    <section class="py-5" id="productSection">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center"
+                id="productContainer">
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const productCategory = 'Merchandise';
+
+            // Fetch product data from add_product.php with the category parameter
+            fetch(`add_product.php?productCategory=${productCategory}`)
+                .then(response => response.json())
+                .then(data => displayProducts(data))
+                .catch(error => console.error('Error fetching product data:', error));
+
+            // Function to display products dynamically
+            function displayProducts(products) {
+                const productContainer = document.getElementById('productContainer');
+
+                products.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'col mb-5';
+                    productCard.innerHTML = `
+                        <div class="card h-100">
+                            <img class="card-img-top" src="${product.image_path}" alt="Product Image" />
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <h5 class="fw-bolder">${product.product_name}</h5>
+                                    RM ${product.price}
+                                    <p class="stock-info">Stock: ${product.stock_quantity} available</p>
+                                </div>
+                                <div class="mt-2">
+                                    Rating: <span id="avgRating_${product.product_id}"></span>${generateStarRating(product.avg_rating)}
+                                </div>
+                            </div>
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center">
+                                    <a class="btn btn-outline-dark mt-auto view-options-btn" href="option.html" data-product-id="${product.product_id}">View options</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    productContainer.appendChild(productCard);
+
+                    // Fetch and display the average rating
+                    fetch(`get_average_rating.php?product_id=${product.product_id}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const avgRatingElement = document.getElementById(`avgRating_${product.product_id}`);
+                            avgRatingElement.textContent = data.average_rating;
+                        })
+                        .catch(error => console.error('Error fetching rating:', error));
+                });
+
+                // Add event listener to the "View options" buttons
+                const viewOptionsButtons = document.querySelectorAll('.view-options-btn');
+                viewOptionsButtons.forEach(button => {
+                    button.addEventListener('click', function (event) {
+                        // Prevent the default behavior of the anchor tag
+                        event.preventDefault();
+
+                        // Check if the button is not the login button
+                        if (!button.classList.contains('login-btn')) {
+                            // Get the product ID from the data attribute
+                            const productId = button.dataset.productId;
+
+                            // Redirect to option.html with the product ID as a query parameter
+                            window.location.href = `option.html?id=${productId}`;
+                        }
+                    });
+                });
+            }
+
+            // Function to generate star icons based on the rating
+            function generateStarRating(rating) {
+                const starCount = 5;
+                const filledStars = Math.floor(rating);
+                const halfStar = rating % 1 !== 0;
+
+                let starsHtml = '';
+
+                for (let i = 0; i < filledStars; i++) {
+                    starsHtml += '<i class="bi bi-star-fill text-warning"></i>';
+                }
+
+                if (halfStar) {
+                    starsHtml += '<i class="bi bi-star-half text-warning"></i>';
+                }
+
+                const emptyStars = starCount - filledStars - (halfStar ? 1 : 0);
+
+                for (let i = 0; i < emptyStars; i++) {
+                    starsHtml += '<i class="bi bi-star text-warning"></i>';
+                }
+
+                return starsHtml;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Show the floating message using Bootstrap's Toast
+            const floatingMessage = new bootstrap.Toast(document.getElementById('floatingMessage'));
+            floatingMessage.show();
+        });
+    </script>
+
+    <!-- Floating Message Toast -->
+    <div id="floatingMessage" class="toast" role="alert" aria-live="assertive" aria-atomic="true"
+        style="position: fixed; top: 10px; right: 10px;">
+        <div class="toast-header">
+            <strong class="me-auto">Moonstore Floating Message</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Welcome new shoppers! Kindly please add your address in the User after you registered in the navigation bar
+            after register..
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark sticky-footer">
+        <div class="container">
+            <p class="m-0 text-center text-white">Copyright &copy; MoonStore ˚☾˚｡⋆ 2023</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
